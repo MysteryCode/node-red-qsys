@@ -1,0 +1,88 @@
+<div class="form-row">
+    <label for="node-input-name">
+        <i class="fa fa-tag"></i>
+        <span data-i18n="node-red:common.label.name"></span>
+    </label>
+    <input type="text" id="node-input-name" data-i18n="[placeholder]node-red:common.label.name" />
+</div>
+
+<div class="form-row">
+  <label for="node-input-core">
+    <span data-i18n="qsys-mixer.label.core"></span>
+  </label>
+  <input type="text" id="node-input-core" />
+</div>
+
+<div class="form-row">
+  <label for="node-input-codename">
+    <span data-i18n="qsys-mixer.label.codename"></span>
+  </label>
+  <input type="text" id="node-input-codename" data-i18n="[placeholder]qsys-mixer.placeholder.codename" />
+</div>
+
+<div class="form-row">
+  <label for="node-input-method">
+    <span data-i18n="qsys-mixer.label.method"></span>
+  </label>
+  <select id="node-input-method">
+    <optgroup data-i18n="[label]qsys-mixer.method.CrossPoint">
+      <option value="SetCrossPointGain" data-i18n="qsys-mixer.method.SetCrossPointGain" data-enables="ramp,ins,outs"></option>
+      <option value="SetCrossPointDelay" data-i18n="qsys-mixer.method.SetCrossPointDelay" data-enables="ramp,ins,outs"></option>
+      <option value="SetCrossPointMute" data-i18n="qsys-mixer.method.SetCrossPointMute" data-enables="ins,outs"></option>
+      <option value="SetCrossPointSolo" data-i18n="qsys-mixer.method.SetCrossPointSolo" data-enables="ins,outs"></option>
+    </optgroup>
+    <optgroup data-i18n="[label]qsys-mixer.method.Input">
+      <option value="SetInputGain" data-i18n="qsys-mixer.method.SetInputGain" data-enables="ramp,ins"></option>
+      <option value="SetInputMute" data-i18n="qsys-mixer.method.SetInputMute" data-enables="ins"></option>
+      <option value="SetInputSolo" data-i18n="qsys-mixer.method.SetInputSolo" data-enables="ins"></option>
+    </optgroup>
+    <optgroup data-i18n="[label]qsys-mixer.method.Output">
+      <option value="SetOutputGain" data-i18n="qsys-mixer.method.SetOutputGain" data-enables="ramp,outs"></option>
+      <option value="SetOutputMute" data-i18n="qsys-mixer.method.SetOutputMute" data-enables="outs"></option>
+    </optgroup>
+    <optgroup data-i18n="[label]qsys-mixer.method.Cue">
+      <option value="SetCueMute" data-i18n="qsys-mixer.method.SetCueMute" data-enables="cues"></option>
+      <option value="SetCueGain" data-i18n="qsys-mixer.method.SetCueGain" data-enables="ramp,cues"></option>
+    </optgroup>
+    <optgroup data-i18n="[label]qsys-mixer.method.InputCue">
+      <option value="SetInputCueEnable" data-i18n="qsys-mixer.method.SetInputCueEnable" data-enables="ins,cues"></option>
+      <option value="SetInputCueAfl" data-i18n="qsys-mixer.method.SetInputCueAfl" data-enables="ins,cues"></option>
+    </optgroup>
+  </select>
+</div>
+
+<div class="form-row" style="display: none;">
+  <label for="node-input-ins">
+    <span data-i18n="qsys-mixer.label.ins"></span>
+  </label>
+  <select id="node-input-ins" multiple>
+    <option value="*">Alle</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+  </select>
+</div>
+
+<div class="form-row" style="display: none;">
+  <label for="node-input-outs">
+    <span data-i18n="qsys-mixer.label.outs"></span>
+  </label>
+  <select id="node-input-outs" multiple>
+    <option value="*">Alle</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+  </select>
+</div>
+
+<div class="form-row" style="display: none;">
+  <label for="node-input-cues">
+    <span data-i18n="qsys-mixer.label.cues"></span>
+  </label>
+  <select id="node-input-cues" multiple>
+    <option value="*">Alle</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+  </select>
+</div>

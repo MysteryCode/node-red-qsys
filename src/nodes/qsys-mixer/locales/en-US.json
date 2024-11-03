@@ -1,0 +1,32 @@
+{
+  "label": {
+    "core": "Q-SYS Core",
+    "codename": "Device-ID",
+    "method": "Action",
+    "ins": "Inputs",
+    "outs": "Outputs"
+  },
+  "placeholder": {
+    "codename": "Mixer_8x8"
+  },
+  "method": {
+    "CrossPoint": "Cross-Points",
+    "Input": "Inputs",
+    "Output": "Outputs",
+    "Cue": "Cues",
+    "InputCue": "Input-Cues",
+    "SetCrossPointGain": "Gain",
+    "SetCrossPointDelay": "Deplay",
+    "SetCrossPointMute": "Mute",
+    "SetCrossPointSolo": "Solo",
+    "SetInputGain": "Gain",
+    "SetInputMute": "Mute",
+    "SetInputSolo": "Solo",
+    "SetOutputGain": "Gain",
+    "SetOutputMute": "Mute",
+    "SetCueMute": "Mute",
+    "SetCueGain": "Gain",
+    "SetInputCueEnable": "Enable / Disable",
+    "SetInputCueAfl": "After Fader Level"
+  }
+}
