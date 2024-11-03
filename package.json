@@ -37,6 +37,8 @@
   "node-red": {
     "version": ">=4.0.5",
     "nodes": {
+      "qsys-config": "dist/nodes/qsys-config/qsys-config.js",
+      "qsys-mixer": "dist/nodes/qsys-mixer/qsys-mixer.js"
     }
   },
   "engines": {
