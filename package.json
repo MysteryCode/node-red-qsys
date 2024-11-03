@@ -1,6 +1,6 @@
 {
-  "name": "@mysterycode/node-red-example",
-  "description": "Template-Repository for Node-RED packages",
+  "name": "@mysterycode/node-red-qsys",
+  "description": "Implementation of Q-SYS QRC to Node-RED.",
   "version": "0.0.1",
   "author": "MysteryCode",
   "license": "GPL-3.0-only",
@@ -26,7 +26,13 @@
     "prepack": "npm run prettier:fix && npm run lint:fix && npm run build"
   },
   "keywords": [
-    "node-red"
+    "node-red",
+    "qsys",
+    "q-sys",
+    "qsc",
+    "audio",
+    "control",
+    "conference"
   ],
   "node-red": {
     "version": ">=4.0.5",
@@ -39,7 +45,7 @@
   "main": "dist",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MysteryCode/node-red-example.git"
+    "url": "https://github.com/MysteryCode/node-red-qsc.git"
   },
   "files": [
     "src",
