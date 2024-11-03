@@ -37,11 +37,11 @@ RED.nodes.registerType("qsys-config", {
     return this.name;
   },
   oneditprepare: function () {
-    document.getElementById("node-config-input-authentication").addEventListener("change", (event) => {
+    document.getElementById("node-config-input-authentication")?.addEventListener("change", (event) => {
       const field: HTMLInputElement = event.currentTarget as HTMLInputElement;
 
-      document.querySelectorAll(`[data-requires="${field.id}"]`).forEach((element: HTMLElement) => {
-        element.style.display = field.checked ? "block" : "none";
+      document.querySelectorAll(`[data-requires="${field.id}"]`).forEach((element) => {
+        (element as HTMLElement).style.display = field.checked ? "block" : "none";
       });
     });
   },

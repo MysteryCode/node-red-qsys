@@ -76,7 +76,7 @@
             return this.name;
         },
         oneditprepare: function () {
-            document.getElementById("node-config-input-authentication").addEventListener("change", (event) => {
+            document.getElementById("node-config-input-authentication")?.addEventListener("change", (event) => {
                 const field = event.currentTarget;
                 document.querySelectorAll(`[data-requires="${field.id}"]`).forEach((element) => {
                     element.style.display = field.checked ? "block" : "none";
