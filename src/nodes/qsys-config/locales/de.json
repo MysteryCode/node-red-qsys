@@ -1,0 +1,11 @@
+{
+  "label": {
+    "host": "IP-Adresse",
+    "authentication": "Authentifizierung aktivieren",
+    "user": "Benutzername",
+    "password": "Passwort"
+  },
+  "placeholder": {
+    "host": "127.0.0.1:1710"
+  }
+}

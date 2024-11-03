@@ -1,0 +1,13 @@
+{
+  "qsys-config": {
+    "label": {
+      "host": "IP-Address",
+      "authentication": "Requires authentication",
+      "user": "username",
+      "password": "password"
+    },
+    "placeholder": {
+      "host": "127.0.0.1:1710"
+    }
+  }
+}
