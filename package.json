@@ -40,7 +40,8 @@
       "qsys-config": "dist/nodes/qsys-config/qsys-config.js",
       "qsys-status": "dist/nodes/qsys-status/qsys-status.js",
       "qsys-mixer": "dist/nodes/qsys-mixer/qsys-mixer.js",
-      "qsys-named-control": "dist/nodes/qsys-named-control/qsys-named-control.js"
+      "qsys-named-control": "dist/nodes/qsys-named-control/qsys-named-control.js",
+      "qsys-snapshot": "dist/nodes/qsys-snapshot/qsys-snapshot.js"
     }
   },
   "engines": {
