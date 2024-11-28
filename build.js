@@ -10,6 +10,7 @@ const {
   writeFileSync,
   mkdirSync,
   realpathSync,
+  copyFileSync,
 } = require("node:fs");
 const nodesSourceDir = cwd() + "/src/nodes";
 const nodesTargetDir = cwd() + "/dist/nodes";
@@ -128,6 +129,27 @@ function copyLocales(node, sourcePath, targetPath) {
     });
 }
 
+/**
+ * @param node String
+ * @param sourcePath String
+ * @param targetPath String
+ */
+function copyIcons(node, sourcePath, targetPath) {
+  if (!existsSync(`${sourcePath}/icons`)) {
+    return;
+  }
+
+  mkdirSync(`${targetPath}/icons`, {
+    recursive: true,
+  });
+
+  readdirSync(`${sourcePath}/icons`, {
+    recursive: false,
+  }).forEach((icon) => {
+    copyFileSync(`${sourcePath}/icons/${icon}`, `${targetPath}/icons/${icon}`);
+  });
+}
+
 readdirSync(nodesSourceDir, {
   recursive: false,
 })
@@ -143,4 +165,5 @@ readdirSync(nodesSourceDir, {
     buildForm(node, sourcePath, targetPath);
 
     copyLocales(node, sourcePath, targetPath);
+    copyIcons(node, sourcePath, targetPath);
   });
