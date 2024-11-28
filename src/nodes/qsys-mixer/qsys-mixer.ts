@@ -1,6 +1,12 @@
 import { Node, NodeAPI, NodeDef } from "node-red";
 import { NodeMessage, NodeStatus } from "@node-red/registry";
-import { Config as QsysConfigNodeConfig, QsysConfigNode, QsysMessage, reserveId } from "../qsys-config/qsys-config";
+import {
+  Config as QsysConfigNodeConfig,
+  QSysApiError,
+  QsysConfigNode,
+  QsysMessage,
+  reserveId,
+} from "../qsys-config/qsys-config";
 
 export type MixerControlMethod =
   | "SetCrossPointGain"
@@ -345,10 +351,8 @@ class NodeHandler {
   }
 
   protected send(message: Partial<QsysMessage>) {
-    this.core?.nodeHandler.send(message)?.catch((e) => {
-      if (e instanceof Error) {
-        this.node.warn(`${e.message}\nMessage: ${JSON.stringify(message, null, 2)}`);
-      }
+    this.core?.nodeHandler.send(message).catch((e) => {
+      this.node.error(e as Error | QSysApiError);
     });
   }
 }

@@ -1,6 +1,6 @@
 import { Node, NodeAPI, NodeDef } from "node-red";
 import {
-  Config as QsysConfigNodeConfig,
+  Config as QsysConfigNodeConfig, QSysApiError,
   QsysConfigNode,
   QsysResponse,
   reserveId,
@@ -79,8 +79,8 @@ class NodeHandler {
 
           this.node.send(msg);
         })
-        .catch((err) => {
-          this.node.error(err);
+        .catch((e) => {
+          this.node.error(e as Error | QSysApiError);
         });
     });
   }

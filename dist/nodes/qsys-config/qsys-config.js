@@ -1,11 +1,56 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.QSysApiError = void 0;
 exports.reserveId = reserveId;
 const node_net_1 = require("node:net");
 let lastId = 0;
 function reserveId() {
     return lastId++;
 }
+class QSysApiError extends Error {
+    code;
+    constructor(code, message) {
+        super(message);
+        this.code = code;
+    }
+    get hint() {
+        switch (this.code) {
+            case -32700:
+                return "Parse error. Invalid JSON was received by the server.";
+            case -32600:
+                return "Invalid request. The JSON sent is not a valid Request object.";
+            case -32601:
+                return "Method not found.";
+            case -32602:
+                return "Invalid params.";
+            case -32603:
+                return "Server error.";
+            case -32604:
+                return "Core is on Standby. This code is returned when a QRC command is received while the Core is not the active Core in a redundant Core configuration.";
+            case 2:
+                return "Invalid Page Request ID";
+            case 3:
+                return "Bad Page Request - could not create the requested Page Request";
+            case 4:
+                return "Missing file";
+            case 5:
+                return "Change Groups exhausted";
+            case 6:
+                return "Unknown change croup";
+            case 7:
+                return "Unknown component name";
+            case 8:
+                return "Unknown control";
+            case 9:
+                return "Illegal mixer channel index";
+            case 10:
+                return "Logon required";
+            default:
+                return "Unknown Error";
+        }
+    }
+}
+exports.QSysApiError = QSysApiError;
 class NodeHandler {
     node;
     config;
@@ -71,7 +116,7 @@ class NodeHandler {
                     }, socket)
                         .then((response) => {
                         if (response.error) {
-                            const error = new Error(response.error);
+                            const error = new QSysApiError(response.error.code, response.error.message);
                             handleReject(error);
                         }
                         else {
@@ -173,6 +218,10 @@ class NodeHandler {
                 if (data.id === input.id) {
                     clearTimeout(timeout);
                     this.node.removeListener("package", listener);
+                    if (data.error !== undefined) {
+                        const error = new QSysApiError(data.error.code, data.error.message);
+                        reject(error);
+                    }
                     resolve(data);
                 }
             };

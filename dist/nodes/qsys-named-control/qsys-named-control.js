@@ -72,9 +72,7 @@ class NodeHandler {
                 this.node.send(msg);
             })
                 .catch((e) => {
-                if (e instanceof Error) {
-                    this.node.error(e.message);
-                }
+                this.node.error(e);
             });
         });
     }

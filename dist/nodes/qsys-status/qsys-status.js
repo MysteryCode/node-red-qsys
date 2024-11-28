@@ -50,8 +50,8 @@ class NodeHandler {
                 msg.payload = response.result;
                 this.node.send(msg);
             })
-                .catch((err) => {
-                this.node.error(err);
+                .catch((e) => {
+                this.node.error(e);
             });
         });
     }

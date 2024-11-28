@@ -1,5 +1,11 @@
 import { Node, NodeAPI, NodeDef } from "node-red";
-import { Config as QsysConfigNodeConfig, QsysConfigNode, QsysResponse, reserveId } from "../qsys-config/qsys-config";
+import {
+  Config as QsysConfigNodeConfig,
+  QSysApiError,
+  QsysConfigNode,
+  QsysResponse,
+  reserveId,
+} from "../qsys-config/qsys-config";
 import { NodeMessage, NodeStatus } from "@node-red/registry";
 
 type NamedControlMethod = "Set" | "Get";
@@ -115,9 +121,7 @@ class NodeHandler {
           this.node.send(msg);
         })
         .catch((e) => {
-          if (e instanceof Error) {
-            this.node.error(e.message);
-          }
+          this.node.error(e as Error | QSysApiError);
         });
     });
   }

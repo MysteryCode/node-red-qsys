@@ -257,10 +257,8 @@ class NodeHandler {
         return selections;
     }
     send(message) {
-        this.core?.nodeHandler.send(message)?.catch((e) => {
-            if (e instanceof Error) {
-                this.node.warn(`${e.message}\nMessage: ${JSON.stringify(message, null, 2)}`);
-            }
+        this.core?.nodeHandler.send(message).catch((e) => {
+            this.node.error(e);
         });
     }
 }
