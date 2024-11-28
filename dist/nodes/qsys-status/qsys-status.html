@@ -1,0 +1,51 @@
+<script type="text/html" data-template-name="qsys-status">
+    <div class="form-row">
+        <label for="node-input-name">
+            <i class="fa fa-tag"></i>
+            <span data-i18n="node-red:common.label.name"></span>
+        </label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]node-red:common.label.name" />
+    </div>
+    
+    <div class="form-row">
+      <label for="node-input-core">
+        <span data-i18n="qsys-mixer.label.core"></span>
+      </label>
+      <input type="text" id="node-input-core" />
+    </div>
+</script>
+<script type="text/html" data-help-name="qsys-status">
+    <p>
+        Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+        sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+        At vero eos et accusam et justo duo dolores et ea rebum.
+        Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+        Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
+        sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+        At vero eos et accusam et justo duo dolores et ea rebum.
+        Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+    </p>
+</script>
+<script type="text/javascript">
+    RED.nodes.registerType("qsys-status", {
+        category: "Q-SYS",
+        paletteLabel: "Q-SYS Status",
+        color: "#1a7ab9",
+        icon: "qsys-status.svg",
+        inputs: 1,
+        outputs: 1,
+        defaults: {
+            name: {
+                value: "Q-SYS Status",
+                required: false,
+            },
+            core: {
+                value: "",
+                type: "qsys-config",
+            },
+        },
+        label: function () {
+            return this.name || "Q-SYS Status";
+        },
+    });
+</script>
