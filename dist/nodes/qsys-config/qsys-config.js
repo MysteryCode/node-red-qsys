@@ -336,4 +336,42 @@ exports.default = (RED) => {
                 .send(JSON.stringify(err, null, 2));
         });
     });
+    RED.httpAdmin.get("/qsys/:id/components/:component/controls", RED.auth.needsPermission("qsys-config.components"), (req, res) => {
+        const nodeId = req.params.id;
+        const component = req.params.component;
+        const node = RED.nodes.getNode(nodeId);
+        if (!node || !component) {
+            res.sendStatus(404);
+            return;
+        }
+        node.nodeHandler
+            .send({
+            method: "Component.GetControls",
+            params: {
+                Name: component,
+            },
+        })
+            .then((response) => {
+            const data = response;
+            res
+                .setHeader("Content-Type", "application/json")
+                .status(200)
+                .send(JSON.stringify(data.result.Controls, null, 2));
+        })
+            .catch((err) => {
+            if (err instanceof QSysApiError) {
+                if (err.code === 7) {
+                    res
+                        .setHeader("Content-Type", "application/json")
+                        .status(404)
+                        .send(JSON.stringify(err, null, 2));
+                    return;
+                }
+            }
+            res
+                .setHeader("Content-Type", "application/json")
+                .status(503)
+                .send(JSON.stringify(err, null, 2));
+        });
+    });
 };
