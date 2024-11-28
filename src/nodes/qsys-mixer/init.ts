@@ -1,5 +1,6 @@
 import { EditorNodeDef, EditorNodeProperties, EditorRED } from "node-red";
 import { MixerControlMethod } from "./qsys-mixer";
+import { QSysResponseComonentsItem } from "../qsys-config/qsys-config";
 
 declare const RED: EditorRED;
 
@@ -10,7 +11,14 @@ interface Defaults extends EditorNodeProperties {
   outs: number[] | "*" | undefined;
   cues: number[] | "*" | undefined;
   ramp: number | undefined;
+  core: string;
 }
+
+type AutoCompleteResult = {
+  value: string;
+  label: string;
+  i: number;
+};
 
 RED.nodes.registerType("qsys-mixer", {
   category: "Q-SYS",
@@ -74,5 +82,38 @@ RED.nodes.registerType("qsys-mixer", {
 
     methodField.addEventListener("change", methodChangeCallback);
     methodChangeCallback();
+
+    // @ts-expect-error using a node red function overlayed over jQuery - mind the big C!
+    $("#node-input-codename").autoComplete({
+      search: (value: string, done: (matches: AutoCompleteResult[]) => void) => {
+        if (!this.core) {
+          return;
+        }
+
+        return $.ajax({
+          url: `qsys/${this.core}/components`,
+          method: "GET",
+        }).done((response: QSysResponseComonentsItem[]) => {
+          const matches: AutoCompleteResult[] = [];
+
+          response.forEach((component) => {
+            const i = component.Name.toLowerCase().indexOf(value.toLowerCase());
+            if (i > -1 && component.Type === "mixer") {
+              matches.push({
+                value: component.Name,
+                label: component.Name,
+                i: i,
+              });
+            }
+          });
+
+          matches.sort((a, b) => {
+            return a.i - b.i;
+          });
+
+          done(matches);
+        });
+      },
+    });
   },
 } as EditorNodeDef<Defaults>);

@@ -161,6 +161,34 @@
             };
             methodField.addEventListener("change", methodChangeCallback);
             methodChangeCallback();
+            // @ts-expect-error using a node red function overlayed over jQuery - mind the big C!
+            $("#node-input-codename").autoComplete({
+                search: (value, done) => {
+                    if (!this.core) {
+                        return;
+                    }
+                    return $.ajax({
+                        url: `qsys/${this.core}/components`,
+                        method: "GET",
+                    }).done((response) => {
+                        const matches = [];
+                        response.forEach((component) => {
+                            const i = component.Name.toLowerCase().indexOf(value.toLowerCase());
+                            if (i > -1 && component.Type === "mixer") {
+                                matches.push({
+                                    value: component.Name,
+                                    label: component.Name,
+                                    i: i,
+                                });
+                            }
+                        });
+                        matches.sort((a, b) => {
+                            return a.i - b.i;
+                        });
+                        done(matches);
+                    });
+                },
+            });
         },
     });
 </script>

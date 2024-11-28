@@ -57,6 +57,15 @@ export interface QsysResponseChangeGroupPoll extends QsysResponse {
   };
 }
 
+export interface QSysResponseComonentsItem {
+  ControlSource: number;
+  Controls: null | Array<unknown>;
+  ID: string;
+  Name: string;
+  Properties: Array<unknown>;
+  Type: string;
+}
+
 export interface Config extends NodeDef {
   host: string;
   authentication: 0 | 1 | undefined;
@@ -452,6 +461,13 @@ class NodeHandler {
       this.statusCallbacks.delete(nodeId);
     }
   }
+
+  public async getComponentList() {
+    return await this.send({
+      method: "Component.GetComponents",
+      params: undefined,
+    });
+  }
 }
 
 export default (RED: NodeAPI): void => {
@@ -473,4 +489,30 @@ export default (RED: NodeAPI): void => {
       },
     },
   );
+
+  RED.httpAdmin.get("/qsys/:id/components", RED.auth.needsPermission("qsys-config.components"), (req, res) => {
+    const nodeId = req.params.id;
+    const node = RED.nodes.getNode(nodeId) as QsysConfigNode<Config> | undefined;
+
+    if (!node) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    node.nodeHandler
+      .getComponentList()
+      .then((response) => {
+        res
+          .setHeader("Content-Type", "application/json")
+          .status(200)
+          .send(JSON.stringify(response.result, null, 2));
+      })
+      .catch((err) => {
+        res
+          .setHeader("Content-Type", "application/json")
+          .status(503)
+          .send(JSON.stringify(err, null, 2));
+      });
+  });
 };

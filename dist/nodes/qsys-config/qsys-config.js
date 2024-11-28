@@ -293,6 +293,12 @@ class NodeHandler {
             this.statusCallbacks.delete(nodeId);
         }
     }
+    async getComponentList() {
+        return await this.send({
+            method: "Component.GetComponents",
+            params: undefined,
+        });
+    }
 }
 exports.default = (RED) => {
     RED.nodes.registerType("qsys-config", function (config) {
@@ -307,5 +313,27 @@ exports.default = (RED) => {
                 type: "password",
             },
         },
+    });
+    RED.httpAdmin.get("/qsys/:id/components", RED.auth.needsPermission("qsys-config.components"), (req, res) => {
+        const nodeId = req.params.id;
+        const node = RED.nodes.getNode(nodeId);
+        if (!node) {
+            res.sendStatus(404);
+            return;
+        }
+        node.nodeHandler
+            .getComponentList()
+            .then((response) => {
+            res
+                .setHeader("Content-Type", "application/json")
+                .status(200)
+                .send(JSON.stringify(response.result, null, 2));
+        })
+            .catch((err) => {
+            res
+                .setHeader("Content-Type", "application/json")
+                .status(503)
+                .send(JSON.stringify(err, null, 2));
+        });
     });
 };
