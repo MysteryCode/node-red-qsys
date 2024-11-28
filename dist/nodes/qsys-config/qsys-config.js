@@ -1,6 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.reserveId = reserveId;
 const node_net_1 = require("node:net");
+let lastId = 0;
+function reserveId() {
+    return lastId++;
+}
 class NodeHandler {
     node;
     config;
@@ -21,26 +26,32 @@ class NodeHandler {
     }
     async getSocket() {
         if (this.socket) {
-            return this.socket;
+            return Promise.resolve(this.socket);
         }
         return this.initSocket();
     }
     async initSocket() {
         if (this.connectionPromise) {
-            try {
-                const socket = await this.connectionPromise;
-                return socket;
-            }
-            catch (e) {
-                if (e instanceof Error) {
-                    this.node.error(e);
-                }
-            }
+            return this.connectionPromise;
         }
         const target = this.config.host.split(":");
         const host = target[0];
         const port = target[1] ? parseInt(target[1], 10) : 1710;
         this.connectionPromise = new Promise((resolve, reject) => {
+            const handleReject = (error) => {
+                this.connectionPromise = undefined;
+                this.updateStatus("Error", error);
+                reject(error);
+            };
+            const handleResolve = (socket) => {
+                if (this.socket !== undefined) {
+                    this.closeSocket(this.socket);
+                }
+                this.socket = socket;
+                this.connectionPromise = undefined;
+                this.updateStatus("Connected");
+                resolve(socket);
+            };
             const socket = (0, node_net_1.connect)({
                 host: host,
                 port: port,
@@ -50,40 +61,67 @@ class NodeHandler {
             socket.setMaxListeners(0);
             socket.on("ready", () => {
                 if (this.config.authentication) {
+                    void this.send({
+                        jsonrpc: "2.0",
+                        method: "Logon",
+                        params: {
+                            User: this.node.credentials.username,
+                            Password: this.node.credentials.password,
+                        },
+                    }, socket)
+                        .then((response) => {
+                        if (response.error) {
+                            const error = new Error(response.error);
+                            handleReject(error);
+                        }
+                        else {
+                            handleResolve(socket);
+                        }
+                    })
+                        .catch((e) => {
+                        handleReject(e);
+                    });
                 }
             });
             socket.on("close", () => {
                 const error = new Error(`Socket to ${host}:${port} closed.`);
                 this.closeSocket(socket);
+                if (this.socket === socket) {
+                    this.socket = undefined;
+                }
                 this.node.debug(error.message);
             });
             socket.on("end", () => {
                 const error = new Error(`Socket to ${host}:${port} ended.`);
                 this.closeSocket(socket);
+                if (this.socket === socket) {
+                    this.socket = undefined;
+                }
                 this.node.debug(error.message);
             });
             socket.on("timeout", () => {
                 const error = new Error(`Socket to ${host}:${port} timed out.`);
                 this.closeSocket(socket);
+                if (this.socket === socket) {
+                    this.socket = undefined;
+                }
                 this.node.debug(error.message);
             });
             socket.on("connectionAttemptFailed", () => {
                 const error = new Error(`Connecting to socket ${host}:${port} failed.`);
                 this.closeSocket(socket);
-                reject(error);
+                handleReject(error);
             });
             socket.on("connectionAttemptTimeout", () => {
                 const error = new Error(`Connecting to socket ${host}:${port} timed out.`);
                 this.closeSocket(socket);
-                reject(error);
+                handleReject(error);
             });
             socket.on("connect", () => {
-                this.node.debug(`Connecting to socket to ${host}:${port} succeeded.`);
-                if (this.socket != undefined) {
-                    this.closeSocket(this.socket);
+                this.node.debug(`Connection to socket to ${host}:${port} established.`);
+                if (!this.config.authentication) {
+                    handleResolve(socket);
                 }
-                this.socket = socket;
-                resolve(socket);
             });
             socket.on("error", (err) => {
                 this.node.error(err.message);
@@ -112,15 +150,38 @@ class NodeHandler {
     encapsulate = (input) => {
         return Buffer.concat([Buffer.from(JSON.stringify(input)), Buffer.from([0x0])]);
     };
-    send(input, forcedSocket = this.socket) {
+    async send(input, forcedSocket = this.socket) {
         input.jsonrpc = "2.0";
-        if (forcedSocket) {
-            forcedSocket.write(this.encapsulate(input));
-            return;
+        if (input.params === undefined) {
+            input.params = 0;
         }
-        return this.getSocket().then((socket) => {
-            socket?.write(this.encapsulate(input));
+        if (input.id === undefined) {
+            input.id = reserveId();
+        }
+        let socket;
+        try {
+            socket = forcedSocket || (await this.getSocket());
+        }
+        catch (e) {
+            return Promise.reject(e);
+        }
+        socket?.write(this.encapsulate(input));
+        let listener;
+        let timeout;
+        const promise = new Promise((resolve, reject) => {
+            listener = (data) => {
+                if (data.id === input.id) {
+                    clearTimeout(timeout);
+                    this.node.removeListener("package", listener);
+                    resolve(data);
+                }
+            };
+            this.node.addListener("package", listener);
+            timeout = setTimeout(() => {
+                reject(new Error(`Q-SYS device "${this.node.name}" did not respond within 10 seconds.`));
+            }, 10 * 1000);
         });
+        return promise;
     }
     receive(data) {
         let rx = [];
@@ -130,16 +191,19 @@ class NodeHandler {
                     const obj = JSON.parse(Buffer.from(rx).toString());
                     if ("method" in obj) {
                         switch (obj.method) {
-                            case "EngineStatus":
-                                if (obj.params.State === "Active") {
+                            case "EngineStatus": {
+                                const data = obj;
+                                if (data.params.State === "Active") {
                                     this.node.emit("ready");
                                 }
-                                else if (obj.params.State === "Standby") {
+                                else if (data.params.State === "Standby") {
                                     this.closeSocket(this.socket);
                                 }
                                 break;
+                            }
                             case "ChangeGroup.Poll": {
-                                const changes = obj.params.Changes;
+                                const data = obj;
+                                const changes = data.result.Changes;
                                 if (changes.length !== 0) {
                                     for (let i = 0; i < changes.length; i++) {
                                         this.node.emit("rx", changes[i]);
@@ -151,6 +215,7 @@ class NodeHandler {
                                 break;
                         }
                     }
+                    this.node.emit("package", obj);
                     rx = [];
                 }
                 catch (err) {
@@ -164,12 +229,17 @@ class NodeHandler {
             }
         }
     }
+    updateStatus(status, error) {
+        this.statusCallbacks.forEach((callback) => {
+            callback(this.socket, status, error);
+        });
+    }
     registerStatusCallback(nodeId, callback) {
         if (!this.statusCallbacks.has(nodeId)) {
             this.statusCallbacks.set(nodeId, callback);
         }
     }
-    munregisterStatusCallback(nodeId) {
+    unregisterStatusCallback(nodeId) {
         if (this.statusCallbacks.has(nodeId)) {
             this.statusCallbacks.delete(nodeId);
         }

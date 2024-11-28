@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const qsys_config_1 = require("../qsys-config/qsys-config");
 class NodeHandler {
     node;
     config;
@@ -10,6 +11,34 @@ class NodeHandler {
         this.config = config;
         this.nodeApi = nodeApi;
         this.core = this.nodeApi.nodes.getNode(config.core);
+        this.core.nodeHandler.registerStatusCallback(this.node.id, (_socket, status, error) => {
+            const nodeStatus = {
+                fill: "grey",
+                shape: "dot",
+                text: "",
+            };
+            switch (status) {
+                case "Inactive":
+                    nodeStatus.fill = "grey";
+                    nodeStatus.text = "Inactive.";
+                    break;
+                case "Error":
+                    nodeStatus.fill = "red";
+                    nodeStatus.text = error instanceof Error ? error.message : "Failure.";
+                    break;
+                case "Connected":
+                case "Active":
+                    nodeStatus.fill = "green";
+                    nodeStatus.text = "Connected.";
+                    break;
+                default:
+                    break;
+            }
+            this.node.status(nodeStatus);
+        });
+        this.node.on("close", () => {
+            this.core?.nodeHandler.unregisterStatusCallback(this.node.id);
+        });
         this.node.on("input", (msg, _send, done) => {
             const message = msg;
             const method = message.method ?? this.config.method;
@@ -56,7 +85,7 @@ class NodeHandler {
                 case "SetCrossPointGain":
                 case "SetCrossPointDelay":
                     this.send({
-                        id: Date.now(),
+                        id: (0, qsys_config_1.reserveId)(),
                         method: `Mixer.${method}`,
                         params: {
                             Name: this.config.codename,
@@ -70,7 +99,7 @@ class NodeHandler {
                 case "SetCrossPointMute":
                 case "SetCrossPointSolo":
                     this.send({
-                        id: Date.now(),
+                        id: (0, qsys_config_1.reserveId)(),
                         method: `Mixer.${method}`,
                         params: {
                             Name: this.config.codename,
@@ -82,7 +111,7 @@ class NodeHandler {
                     break;
                 case "SetInputGain":
                     this.send({
-                        id: Date.now(),
+                        id: (0, qsys_config_1.reserveId)(),
                         method: `Mixer.${method}`,
                         params: {
                             Name: this.config.codename,
@@ -95,7 +124,7 @@ class NodeHandler {
                 case "SetInputMute":
                 case "SetInputSolo":
                     this.send({
-                        id: Date.now(),
+                        id: (0, qsys_config_1.reserveId)(),
                         method: `Mixer.${method}`,
                         params: {
                             Name: this.config.codename,
@@ -106,7 +135,7 @@ class NodeHandler {
                     break;
                 case "SetOutputGain":
                     this.send({
-                        id: Date.now(),
+                        id: (0, qsys_config_1.reserveId)(),
                         method: `Mixer.${method}`,
                         params: {
                             Name: this.config.codename,
@@ -118,7 +147,7 @@ class NodeHandler {
                     break;
                 case "SetOutputMute":
                     this.send({
-                        id: Date.now(),
+                        id: (0, qsys_config_1.reserveId)(),
                         method: `Mixer.${method}`,
                         params: {
                             Name: this.config.codename,
@@ -129,7 +158,7 @@ class NodeHandler {
                     break;
                 case "SetCueMute":
                     this.send({
-                        id: Date.now(),
+                        id: (0, qsys_config_1.reserveId)(),
                         method: `Mixer.${method}`,
                         params: {
                             Name: this.config.codename,
@@ -140,7 +169,7 @@ class NodeHandler {
                     break;
                 case "SetCueGain":
                     this.send({
-                        id: Date.now(),
+                        id: (0, qsys_config_1.reserveId)(),
                         method: `Mixer.${method}`,
                         params: {
                             Name: this.config.codename,
@@ -153,7 +182,7 @@ class NodeHandler {
                 case "SetInputCueEnable":
                 case "SetInputCueAfl":
                     this.send({
-                        id: Date.now(),
+                        id: (0, qsys_config_1.reserveId)(),
                         method: `Mixer.${method}`,
                         params: {
                             Name: this.config.codename,
