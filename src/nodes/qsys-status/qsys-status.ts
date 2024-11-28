@@ -1,6 +1,7 @@
 import { Node, NodeAPI, NodeDef } from "node-red";
 import {
-  Config as QsysConfigNodeConfig, QSysApiError,
+  Config as QsysConfigNodeConfig,
+  QSysApiError,
   QsysConfigNode,
   QsysResponse,
   reserveId,
