@@ -1,0 +1,9 @@
+{
+  "label": {
+    "core": "Q-SYS Core",
+    "codename": "Named Control"
+  },
+  "placeholder": {
+    "codename": "Mixer_8x8Input1Mute"
+  }
+}
